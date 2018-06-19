@@ -1,0 +1,9 @@
+.app {
+  padding: 8px 20px;
+}
+
+.app-thumbnail {
+  max-width: 30px;
+  height: auto;
+  margin-right: 15px;
+}

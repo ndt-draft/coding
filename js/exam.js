@@ -1,7 +1,21 @@
 (function() {
   // function to render apps in .contents
   function renderApps(data) {
-    console.log('render apps in .contents', data)
+    let contents = document.getElementsByClassName('contents')[0]
+
+    let html = '<div class="apps list-group">'
+
+    data.map(function(item) {
+      html += '<li class="app list-group-item">'
+        html += '<img class="app-thumbnail" src="' + item.thumbnailUrl + '">'
+        html += item.name
+      html += '</li>'
+    })
+
+    html += '</div>'
+
+    // DANGER
+    contents.innerHTML = html
   }
 
   // function to filter apps by keyword and re-render in .contents

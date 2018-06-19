@@ -21,7 +21,7 @@ var TABLE_DATA = [
   },
   {
     "id": "10",
-    "name": "<img onerror='window.document.body.innerHTML = \"<h1>XSS</h1>\";' src=''> ",
+    "name": "iTunes",
     "thumbnailUrl": "image/iTunes.png"
   },
   {
