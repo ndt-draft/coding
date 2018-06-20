@@ -1,5 +1,8 @@
 (function() {
-  let contents = document.getElementsByClassName('contents')[0]
+  let contents = document.querySelector('.contents')
+  let input = document.querySelector('[name=apps]')
+  let form = document.querySelector('form')
+  let activeAppIndex
 
   // function to render apps in .contents
   function renderApps(data) {
@@ -16,6 +19,9 @@
 
     // DANGER
     contents.innerHTML = html
+
+    // reset active index
+    activeAppIndex = undefined
   }
 
   // function to filter apps by keyword and re-render in .contents
@@ -31,29 +37,74 @@
   }
 
   // add event listener to input
-  let input = document.getElementsByName('apps')[0]
   input.addEventListener('input', suggestAppsByKeyword)
 
-  let activeAppIndex
-  // function to select app
-  function selectApp(e) {
+  input.addEventListener('keydown', function (e) {
     let apps = contents.childNodes[0].childNodes
-    if(e.target && e.target.nodeName == "DIV") {
+    let activeIndex = activeAppIndex
+
+    switch (e.keyCode) {
+      // arrow up or down
+      case 38:
+      case 40:
+        // up
+        if (e.keyCode === 38) {
+          activeIndex--
+        // down
+        } else if (e.keyCode === 40) {
+          activeIndex++
+        }
+
+        if (activeAppIndex === undefined) {
+          activeIndex = 0
+        }
+
+        selectApp(apps[activeIndex])
+        break
+
+      // enter
+      case 13:
+        if (apps[activeAppIndex]) {
+          updateAppInput(apps[activeAppIndex].textContent)
+        }
+        break
+    }
+  })
+
+  document.addEventListener('click', function (e) {
+    if (e.target === input || contents.contains(e.target)) {
+      contents.classList.remove('hide')
+    } else {
+      contents.classList.add('hide')
+    }
+  })
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault()
+  })
+
+  // function to select app
+  function selectApp(targetNode, options = {}) {
+    if(targetNode && targetNode.nodeName == "DIV") {
+      let apps = contents.childNodes[0].childNodes
+
       // remove active class from old active app
       if (activeAppIndex !== undefined) {
         apps[activeAppIndex].classList.remove('active-app')
       }
 
       // add active class to current target
-      e.target.classList.add('active-app')
+      targetNode.classList.add('active-app')
 
       // update input field value with corresponding app name
-      input.value = e.target.textContent
+      if (options.updateAppInput) {
+        updateAppInput(targetNode.textContent)
+      }
 
       // find app index
       // https://stackoverflow.com/a/5913984
       let targetIndex = 0;
-      let target = e.target
+      let target = targetNode
       while( (target = target.previousSibling) != null ) {
         targetIndex++;
       }
@@ -63,8 +114,17 @@
     }
   }
 
+  function updateAppInput(value) {
+    input.value = value
+    input.focus()
+  }
+
   // add click event to each app
-  contents.addEventListener('click', selectApp)
+  contents.addEventListener('click', function(e) {
+    selectApp(e.target, {
+      updateAppInput: true
+    })
+  })
 
   // run
   renderApps(TABLE_DATA)
