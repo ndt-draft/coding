@@ -68,6 +68,12 @@
           updateAppInput(apps[activeAppIndex].textContent)
         }
         break
+
+      // esc
+      case 27:
+        input.blur()
+        contents.classList.add('hide')
+        break
     }
   })
 
