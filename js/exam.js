@@ -4,12 +4,22 @@
     input: document.querySelector('[name=apps]'),
     form: document.querySelector('form'),
     activeAppIndex: undefined,
+    data: TABLE_DATA,
+    apps: [],
+    indexes: [],
     init() {
       // bind events
       this.bindEvents()
 
+      // create app nodes
+      this.apps = this.createAppNodes(this.data)
+
+      this.indexes = this.data.map(function (item, index) {
+        return index
+      })
+
       // run
-      this.renderApps(TABLE_DATA)
+      this.renderApps(this.indexes)
     },
     bindEvents() {
       // add event listener to input
@@ -28,15 +38,24 @@
     handleInputApp(event) {
       let keyword = event.target.value.trim().toLowerCase()
 
-      let suggestions = TABLE_DATA.filter(function(item) {
-        // https://stackoverflow.com/a/1789952
-        return item.name.toLowerCase().indexOf(keyword) >= 0
+      let suggestIndexes = this.data.map(function (item, index) {
+        return {
+          index: index,
+          // https://stackoverflow.com/a/1789952
+          suggest: item.name.toLowerCase().indexOf(keyword) >= 0
+        }
       })
 
-      this.renderApps(suggestions)
+      suggestIndexes = suggestIndexes.filter(function(item) {
+        return item.suggest
+      }).map(function(item) {
+        return item.index
+      })
+
+      this.renderApps(suggestIndexes)
     },
     handleKeyDownInput(e) {
-      let apps = this.contents.childNodes[0].childNodes
+      let apps = this.getAppNodes()
       let activeIndex = this.activeAppIndex
 
       switch (e.keyCode) {
@@ -87,14 +106,50 @@
         updateAppInput: true
       })
     },
+    createAppNodes(data) {
+      return data.map(function(item) {
+        let app = document.createElement('div')
+        app.className = 'app list-group-item'
+
+        let img = document.createElement('img')
+        img.className = 'app-thumbnail'
+        img.src = item.thumbnailUrl
+
+        let name = document.createTextNode(item.name)
+
+        app.appendChild(img)
+        app.appendChild(name)
+
+        return app
+      })
+    },
+    getAppNodes() {
+      let nodes = []
+      this.contents.childNodes.forEach(function(node) {
+        if (node.nodeName === 'DIV') {
+          nodes.push(node)
+        }
+      })
+      return nodes
+    },
     updateAppInput(value) {
       this.input.value = value
       this.input.focus()
     },
     // function to select app
     selectApp(targetNode, options = {}) {
-      if(targetNode && targetNode.nodeName == "DIV") {
-        let apps = this.contents.childNodes[0].childNodes
+      if(targetNode && targetNode.className.indexOf('app') >= 0) {
+        let apps = this.getAppNodes()
+
+        // find target index
+        let targetIndex = apps.findIndex(function(app) {
+          return app === targetNode
+        })
+
+        // cancel click active app
+        if (this.activeAppIndex === targetIndex) {
+          return
+        }
 
         // remove active class from old active app
         if (this.activeAppIndex !== undefined) {
@@ -109,33 +164,28 @@
           this.updateAppInput(targetNode.textContent)
         }
 
-        // find app index
-        // https://stackoverflow.com/a/5913984
-        let targetIndex = 0;
-        let target = targetNode
-        while( (target = target.previousSibling) != null ) {
-          targetIndex++;
-        }
-
         // save active app index
         this.activeAppIndex = targetIndex
       }
     },
     // function to render apps in .contents
-    renderApps(data) {
-      let html = '<div class="app-list list-group">'
-
-      data.map(function(item) {
-        html += '<div class="app list-group-item">'
-          html += '<img class="app-thumbnail" src="' + item.thumbnailUrl + '">'
-          html += item.name
-        html += '</div>'
+    renderApps(suggestionIndexes) {
+      let nonSuggestionIndexes = this.indexes.filter(function (index) {
+        return suggestionIndexes.indexOf(index) < 0
       })
 
-      html += '</div>'
+      nonSuggestionIndexes.map(function (index) {
+        exam.apps[index].remove()
+      })
 
-      // DANGER
-      this.contents.innerHTML = html
+      suggestionIndexes
+        .filter(function(index) {
+          return !exam.contents.contains(exam.apps[index])
+        })
+        .map(function (index) {
+          exam.apps[index].classList.remove('active-app')
+          exam.contents.appendChild(exam.apps[index])
+        })
 
       // reset active index
       this.activeAppIndex = undefined
