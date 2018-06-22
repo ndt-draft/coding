@@ -52,6 +52,12 @@
         return item.index
       })
 
+      // remove active class if available
+      let apps = this.getAppNodes()
+      if (apps[this.activeAppIndex]) {
+        apps[this.activeAppIndex].classList.remove('active-app')
+      }
+
       this.renderApps(suggestIndexes)
     },
     handleKeyDownInput(e) {
