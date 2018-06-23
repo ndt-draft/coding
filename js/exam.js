@@ -106,7 +106,7 @@
       }
     },
     handleClickDocument(e) {
-      if (e.target === this.input || this.contents.contains(e.target)) {
+      if (e.target === this.input || (!this.contents.isEqualNode(e.target) && this.contents.contains(e.target))) {
         this.contents.classList.remove('hide')
       } else {
         this.contents.classList.add('hide')
