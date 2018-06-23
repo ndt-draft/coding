@@ -18,6 +18,9 @@
         return index
       })
 
+      // make local count data
+      this.makeLocalCountData()
+
       // run
       this.renderApps(this.indexes)
     },
@@ -88,7 +91,8 @@
         // enter
         case 13:
           if (apps[activeAppIndex]) {
-            this.updateAppInput(apps[activeAppIndex].textContent)
+            this.updateAppInput(apps[activeAppIndex].getAttribute('data-name'))
+            this.countSelectApp(apps[activeAppIndex])
           }
           break
 
@@ -113,20 +117,27 @@
       this.selectApp(e.target, {
         updateAppInput: true
       })
+      this.countSelectApp(e.target)
     },
     createAppNodes(data) {
       return data.map(function(item) {
         let app = document.createElement('div')
         app.className = 'app list-group-item'
+        app.id = item.id
+        app.setAttribute('data-name', item.name)
 
         let img = document.createElement('img')
         img.className = 'app-thumbnail'
         img.src = item.thumbnailUrl
 
+        let badge = document.createElement('span')
+        badge.className = 'badge'
+
         let name = document.createTextNode(item.name)
 
         app.appendChild(img)
         app.appendChild(name)
+        app.appendChild(badge)
 
         return app
       })
@@ -143,6 +154,40 @@
     updateAppInput(value) {
       this.input.value = value
       this.input.focus()
+    },
+    makeLocalCountData() {
+      if (localStorage.data) {
+        return
+      }
+
+      let localData = this.data.map(function (app) {
+        return {
+          id: app.id,
+          name: app.name,
+          count: 0
+        }
+      })
+
+      localStorage.data = JSON.stringify(localData)
+    },
+    countSelectApp(appNode) {
+      let data = JSON.parse(localStorage.data)
+
+      let localIndex = data.findIndex(function (item) {
+        return item.id === appNode.id
+      })
+
+      if (localIndex < 0) {
+        return
+      }
+
+      // found, just increase
+      data[localIndex].count += 1
+
+      let badge = appNode.lastChild
+      badge.textContent = data[localIndex].count
+
+      localStorage.data = JSON.stringify(data)
     },
     // function to select app
     selectApp(targetNode, options = {}) {
@@ -169,7 +214,7 @@
 
         // update input field value with corresponding app name
         if (options.updateAppInput) {
-          this.updateAppInput(targetNode.textContent)
+          this.updateAppInput(targetNode.getAttribute('data-name'))
         }
 
         // save active app index
@@ -186,14 +231,39 @@
         exam.apps[index].remove()
       })
 
-      suggestionIndexes
-        .filter(function(index) {
-          return !exam.contents.contains(exam.apps[index])
+      let appIds = suggestionIndexes.map(function (index) {
+        return exam.apps[index].id
+      })
+
+      let countData = JSON.parse(localStorage.data)
+
+      // sort by most count
+      let sortCountData = countData.slice()
+      sortCountData.sort(function (a, b) {
+        return a.count < b.count
+      })
+
+      let appIdsByCount = sortCountData.map(function (item) {
+        return item.id
+      })
+
+      let orderAppIds = appIdsByCount.filter(function (id) {
+        return appIds.indexOf(id) >= 0
+      })
+
+      let orderIndexes = orderAppIds.map(function (id) {
+        return exam.apps.findIndex(function (app) {
+          return app.id === id
         })
-        .map(function (index) {
-          exam.apps[index].classList.remove('active-app')
-          exam.contents.appendChild(exam.apps[index])
-        })
+      })
+
+      // sort app nodes by most select app
+      orderIndexes.map(function (orderIndex) {
+        exam.contents.appendChild(exam.apps[orderIndex])
+
+        let badge = exam.apps[orderIndex].lastChild
+        badge.textContent = countData[orderIndex].count || ''
+      })
 
       // reset active index
       this.activeAppIndex = undefined
