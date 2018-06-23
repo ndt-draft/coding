@@ -220,7 +220,7 @@
         }
 
         // remove active class if target index is different from current active app index
-        if (this.activeAppIndex !== undefined && this.activeAppIndex !== targetIndex) {
+        if (this.activeAppIndex !== undefined && apps[this.activeAppIndex] && this.activeAppIndex !== targetIndex) {
           apps[this.activeAppIndex].classList.remove('active-app')
         }
 
