@@ -156,15 +156,23 @@
       this.input.focus()
     },
     makeLocalCountData() {
+      let localData = []
+
       if (localStorage.data) {
-        return
+        localData = JSON.parse(localStorage.data)
       }
 
-      let localData = this.data.map(function (app) {
-        return {
-          id: app.id,
-          name: app.name,
-          count: 0
+      this.data.map(function (app, index) {
+        let localAppIndex = localData.findIndex(function (localApp) {
+          return localApp.id === app.id
+        })
+
+        if (localAppIndex < 0) {
+          localData.splice(index, 0, {
+            id: app.id,
+            // name: app.name,
+            count: 0
+          })
         }
       })
 
@@ -240,7 +248,7 @@
       // sort by most count
       let sortCountData = countData.slice()
       sortCountData.sort(function (a, b) {
-        return a.count < b.count
+        return b.count - a.count
       })
 
       let appIdsByCount = sortCountData.map(function (item) {
@@ -262,7 +270,11 @@
         exam.contents.appendChild(exam.apps[orderIndex])
 
         let badge = exam.apps[orderIndex].lastChild
-        badge.textContent = countData[orderIndex].count || ''
+        let id = exam.apps[orderIndex].id
+        let localAppIndex = countData.findIndex(function (item) {
+          return item.id === id
+        })
+        badge.textContent = countData[localAppIndex].count || ''
       })
 
       // reset active index
