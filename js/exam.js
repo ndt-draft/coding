@@ -36,6 +36,8 @@
 
       // add click event to each app
       this.contents.addEventListener('click', this.handleClickApp.bind(this))
+
+      this.contents.addEventListener('mousemove', this.handleMouseMoveApp.bind(this))
     },
     // function to filter apps by keyword and re-render in .contents
     handleInputApp(event) {
@@ -118,6 +120,11 @@
         updateAppInput: true
       })
       this.countSelectApp(e.target)
+    },
+    handleMouseMoveApp(e) {
+      this.selectApp(e.target, {
+        mousemove: true
+      })
     },
     createAppNodes(data) {
       return data.map(function(item) {
@@ -207,13 +214,13 @@
           return app === targetNode
         })
 
-        // cancel click active app
-        if (this.activeAppIndex === targetIndex) {
+        // cancel if mousemove on active app
+        if (targetIndex === this.activeAppIndex && options.mousemove) {
           return
         }
 
-        // remove active class from old active app
-        if (this.activeAppIndex !== undefined) {
+        // remove active class if target index is different from current active app index
+        if (this.activeAppIndex !== undefined && this.activeAppIndex !== targetIndex) {
           apps[this.activeAppIndex].classList.remove('active-app')
         }
 
