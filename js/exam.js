@@ -62,31 +62,33 @@
     },
     handleKeyDownInput(e) {
       let apps = this.getAppNodes()
-      let activeIndex = this.activeAppIndex
+      let activeAppIndex = this.activeAppIndex
 
       switch (e.keyCode) {
         // arrow up or down
+        // allow jump to the first app when reachs the last app and vice versa
         case 38:
         case 40:
-          // up
-          if (e.keyCode === 38) {
-            activeIndex--
-          // down
-          } else if (e.keyCode === 40) {
-            activeIndex++
-          }
-
           if (this.activeAppIndex === undefined) {
-            activeIndex = 0
+            // no active app
+            // press arrow down set first app active
+            // press arrow up set last app active
+            activeAppIndex = (e.keyCode === 38) ? (apps.length - 1) : 0
+          // arrow up
+          } else if (e.keyCode === 38) {
+            activeAppIndex = (activeAppIndex + apps.length - 1) % apps.length
+          // arrow down
+          } else if (e.keyCode === 40) {
+            activeAppIndex = (activeAppIndex + 1) % apps.length
           }
 
-          this.selectApp(apps[activeIndex])
+          this.selectApp(apps[activeAppIndex])
           break
 
         // enter
         case 13:
-          if (apps[this.activeAppIndex]) {
-            this.updateAppInput(apps[this.activeAppIndex].textContent)
+          if (apps[activeAppIndex]) {
+            this.updateAppInput(apps[activeAppIndex].textContent)
           }
           break
 
