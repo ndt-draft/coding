@@ -1,3 +1,6 @@
+# Usage
+Just open the file `exam.html` on your browser to run this demo app
+
 # Demo
 ![Demo](./docs/images/demo.png)
 
