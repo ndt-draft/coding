@@ -108,8 +108,7 @@
 
             if (activeAppIndex === apps.length - 1) {
               this.contents.scrollTop = contentsScrollEnd
-            } else if ((this.contents.scrollTop !== 0) &&
-              (apps[activeAppIndex].offsetTop - this.contents.offsetTop - apps[activeAppIndex].offsetHeight < apps[activeAppIndex].offsetHeight)) {
+            } else if ((apps[activeAppIndex].offsetTop - this.contents.offsetTop) < this.contents.scrollTop) {
               this.contents.scrollTop = apps[activeAppIndex].offsetTop - this.contents.offsetTop
             }
 
@@ -119,8 +118,7 @@
 
             if (activeAppIndex === 0) {
               this.contents.scrollTop = 0
-            } else if ((this.contents.scrollTop !== contentsScrollEnd) &&
-              (apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight > this.contents.offsetHeight)) {
+            } else if ((apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight - this.contents.scrollTop) > this.contents.offsetHeight) {
               this.contents.scrollTop = (apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight) % this.contents.offsetHeight
             }
           }
