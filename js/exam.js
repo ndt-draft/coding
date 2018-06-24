@@ -87,18 +87,27 @@
         // allow jump to the first app when reachs the last app and vice versa
         case 38:
         case 40:
+          let contentsScrollEnd = this.contents.scrollHeight - this.contents.offsetHeight
+
           if (this.activeAppIndex === undefined) {
             // no active app
             // press arrow down set first app active
             // press arrow up set last app active
             activeAppIndex = (e.keyCode === 38) ? (apps.length - 1) : 0
+
+            // press arrow up when no hightlight app,
+            // highlight the last app and scroll into the end of list
+            if (e.keyCode === 38) {
+              this.contents.scrollTop = contentsScrollEnd
+            }
           // arrow up
           } else if (e.keyCode === 38) {
             activeAppIndex = (activeAppIndex + apps.length - 1) % apps.length
 
             if (activeAppIndex === apps.length - 1) {
-              this.contents.scrollTop = this.contents.scrollHeight - this.contents.offsetHeight
-            } else if (apps[activeAppIndex].offsetTop - this.contents.offsetTop - apps[activeAppIndex].offsetHeight < apps[activeAppIndex].offsetHeight) {
+              this.contents.scrollTop = contentsScrollEnd
+            } else if ((this.contents.scrollTop !== 0) &&
+              (apps[activeAppIndex].offsetTop - this.contents.offsetTop - apps[activeAppIndex].offsetHeight < apps[activeAppIndex].offsetHeight)) {
               this.contents.scrollTop = apps[activeAppIndex].offsetTop - this.contents.offsetTop
             }
 
@@ -108,7 +117,8 @@
 
             if (activeAppIndex === 0) {
               this.contents.scrollTop = 0
-            } else if (apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight > this.contents.offsetHeight) {
+            } else if ((this.contents.scrollTop !== contentsScrollEnd) &&
+              (apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight > this.contents.offsetHeight)) {
               this.contents.scrollTop = (apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight) % this.contents.offsetHeight
             }
           }
