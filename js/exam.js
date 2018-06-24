@@ -30,6 +30,10 @@
 
       this.input.addEventListener('keydown', this.handleKeyDownInput.bind(this))
 
+      this.input.addEventListener('mousedown', this.handleMouseFocusInput.bind(this))
+
+      this.input.addEventListener('mouseup', this.handleMouseFocusInput.bind(this))
+
       document.addEventListener('click', this.handleClickDocument.bind(this))
 
       this.form.addEventListener('submit', this.handleSubmitForm.bind(this))
@@ -38,6 +42,15 @@
       this.contents.addEventListener('click', this.handleClickApp.bind(this))
 
       this.contents.addEventListener('mousemove', this.handleMouseMoveApp.bind(this))
+
+      // https://stackoverflow.com/a/30818142
+      this.contents.addEventListener('mousedown', function (e) {
+        this.addEventListener('mousemove', exam.handleMouseDownMoveApp)
+      })
+
+      this.contents.addEventListener('mouseup', function () {
+        this.removeEventListener('mousemove', exam.handleMouseDownMoveApp)
+      })
     },
     // function to filter apps by keyword and re-render in .contents
     handleInputApp(event) {
@@ -106,10 +119,17 @@
       }
     },
     handleClickDocument(e) {
-      if (e.target === this.input || (!this.contents.isEqualNode(e.target) && this.contents.contains(e.target))) {
+      if (e.target === this.input || this.contents.contains(e.target)) {
         this.contents.classList.remove('hide')
       } else {
         this.contents.classList.add('hide')
+        this.input.blur()
+      }
+    },
+    handleMouseFocusInput(e) {
+      if (e.target === this.input) {
+        this.input.focus()
+        this.contents.classList.remove('hide')
       }
     },
     handleSubmitForm(e) {
@@ -125,6 +145,9 @@
       this.selectApp(e.target, {
         mousemove: true
       })
+    },
+    handleMouseDownMoveApp(e) {
+      exam.input.focus()
     },
     createAppNodes(data) {
       return data.map(function(item) {
