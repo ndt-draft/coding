@@ -95,9 +95,22 @@
           // arrow up
           } else if (e.keyCode === 38) {
             activeAppIndex = (activeAppIndex + apps.length - 1) % apps.length
+
+            if (activeAppIndex === apps.length - 1) {
+              this.contents.scrollTop = this.contents.scrollHeight - this.contents.offsetHeight
+            } else if (apps[activeAppIndex].offsetTop - this.contents.offsetTop - apps[activeAppIndex].offsetHeight < apps[activeAppIndex].offsetHeight) {
+              this.contents.scrollTop = apps[activeAppIndex].offsetTop - this.contents.offsetTop
+            }
+
           // arrow down
           } else if (e.keyCode === 40) {
             activeAppIndex = (activeAppIndex + 1) % apps.length
+
+            if (activeAppIndex === 0) {
+              this.contents.scrollTop = 0
+            } else if (apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight > this.contents.offsetHeight) {
+              this.contents.scrollTop = (apps[activeAppIndex].offsetTop - this.contents.offsetTop + apps[activeAppIndex].offsetHeight) % this.contents.offsetHeight
+            }
           }
 
           this.selectApp(apps[activeAppIndex])
