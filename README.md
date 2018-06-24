@@ -17,4 +17,4 @@ Just open the file `exam.html` on your browser to run this demo app
       * Press arrow up will highlight the last app
     * Allow to move from the last app to the first app when reachs the end of the list when press arrow down and vice versa 
 3. Store data of selected app count to localStorage, will use this data to show apps order by most selected count (enable user to clear special search history item)
-4. Ready for adding more apps
+4. Ready for adding more apps (checkout to branch `moreApps` to see more apps)
