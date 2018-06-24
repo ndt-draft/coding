@@ -30,6 +30,8 @@
 
       this.input.addEventListener('keydown', this.handleKeyDownInput.bind(this))
 
+      this.input.addEventListener('focus', this.handleFocusInput.bind(this))
+
       this.input.addEventListener('mousedown', this.handleMouseFocusInput.bind(this))
 
       this.input.addEventListener('mouseup', this.handleMouseFocusInput.bind(this))
@@ -140,6 +142,9 @@
           this.contents.classList.add('hide')
           break
       }
+    },
+    handleFocusInput(e) {
+      this.handleClickDocument(e)
     },
     handleClickDocument(e) {
       if (e.target === this.input || this.contents.contains(e.target)) {
